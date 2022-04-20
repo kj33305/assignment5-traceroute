@@ -67,10 +67,10 @@ def get_route(hostname):
     tracelist1 = [] #This is your list to use when iterating through each trace 
     tracelist2 = [] #This is your list to contain all traces
 
-    # destAddr = gethostbyname(hostname)
+    destAddr = gethostbyname(hostname)
     for ttl in range(1,MAX_HOPS):
         for tries in range(TRIES):
-            destAddr = gethostbyname(hostname)
+            #destAddr = gethostbyname(hostname)
 
             #Fill in start
             # Make a raw socket named mySocket
@@ -122,9 +122,10 @@ def get_route(hostname):
                     #Fill in start
                     hostName = gethostbyaddr(addr[0])[0]
                     #Fill in end
-                except herror:   #if the host does not provide a hostname
+                except herror: #if the host does not provide a hostname
                     #Fill in start
-                    print("Unable to provide hostname")
+                    #print("Unable to provide hostname")
+                    hostName = "Unable to provide hostname"
                     #Fill in end
                 if types == 11:
                     bytes = struct.calcsize("d")
