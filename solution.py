@@ -95,7 +95,7 @@ def get_route(hostname):
                 #print(whatReady)
                 howLongInSelect = (time.time() - startedSelect)
                 #print(howLongInSelect)
-                print("Just printed how long in select")
+                #print("Just printed how long in select")
 
                 if whatReady[0] == []: # Timeout
                     tracelist1.append("* * * Request timed out")
@@ -110,10 +110,10 @@ def get_route(hostname):
                     #print("Request timed out")
                     # print('test')
                     #Fill in end
-                    print("On to packet stuff...")
+                    #print("On to packet stuff...")
                 recvPacket, addr = mySocket.recvfrom(1024)
 
-                print("Now I will get time received")
+                #print("Now I will get time received")
                 timeReceived = time.time()
                 #print("Getting time received next")
                 #print(timeReceived)
@@ -130,9 +130,9 @@ def get_route(hostname):
                     #print("cleared tracelist")
                     # Fill in end
             except timeout:
-                print("Timed out and ready to continue")
+                #print("Timed out and ready to continue")
                 continue
-                print("continue")
+                #print("continue")
 
             else:
                 #Fill in start
@@ -145,17 +145,17 @@ def get_route(hostname):
                                                                                                       recvPacket[20:36])
                 types = struct.unpack("b", recvPacket[20:21])
 
-                print("Fetched icmpHeader")
+                #print("Fetched icmpHeader")
 
                 #Fill in end
                 try: #try to fetch the hostname
                     #Fill in start
                     hostName = gethostbyaddr(addr[0])[0]
-                    print(hostName)
+                    #print(hostName)
                     #Fill in end
                 except herror: #if the host does not provide a hostname
                     #Fill in start
-                    print("Unable to provide hostname")
+                    #print("Unable to provide hostname")
                     hostName = "Unable to provide hostname"
                     #Fill in end
                 if types == 11:
