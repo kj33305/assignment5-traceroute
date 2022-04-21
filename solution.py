@@ -127,7 +127,7 @@ def get_route(hostname):
                     tracelist2.append([str(ttl), "*", tracelist1[-1]])
 
                     tracelist1.clear()  # Clearing out tracelist1
-                    print("cleared tracelist")
+                    #  print("cleared tracelist")
                 #  Fill in end
             except timeout:
                 #  print("Timed out and ready to continue")
