@@ -46,6 +46,7 @@ def build_packet():
 
     # Make the header in a similar way to the ping exercise.
     # Append checksum to the header.
+
     dummyChecksum = 0
     header = struct.pack("bbHh", ICMP_ECHO_REQUEST, 0, dummyChecksum, 1)
 
@@ -54,12 +55,15 @@ def build_packet():
     dummyChecksum = checksum(data + header)
 
     header = struct.pack("bbHHh", ICMP_ECHO_REQUEST, 0, dummyChecksum, (os.getpid() & 0xFFFF), 1)
+    #print(header)
     # Don’t send the packet yet , just return the final packet in this function.
     #Fill in end
 
     # So the function ending should look like this
 
     packet = header + data
+    #print("Just made my packet")
+    #print(packet)
     return packet
 
 def get_route(hostname):
@@ -68,10 +72,11 @@ def get_route(hostname):
     tracelist2 = [] #This is your list to contain all traces
 
     destAddr = gethostbyname(hostname)
+    #print(destAddr)
     for ttl in range(1,MAX_HOPS):
         for tries in range(TRIES):
             #destAddr = gethostbyname(hostname)
-
+            #print(destAddr)
             #Fill in start
             # Make a raw socket named mySocket
             mySocket = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP)
@@ -82,85 +87,117 @@ def get_route(hostname):
             try:
                 d = build_packet()
                 mySocket.sendto(d, (hostname, 0))
-                t= time.time()
+                t = time.time()
+                #print(t)
                 startedSelect = time.time()
+                #print(startedSelect)
                 whatReady = select.select([mySocket], [], [], timeLeft)
+                #print(whatReady)
                 howLongInSelect = (time.time() - startedSelect)
+                #print(howLongInSelect)
+                print("Just printed how long in select")
+
                 if whatReady[0] == []: # Timeout
-                    tracelist1.append("Request timed out.")
+                    tracelist1.append("* * * Request timed out")
+                    #print("TimedOut")
                     #Fill in start
                     #You should add the list above to your all traces list
                     tracelist2.append([str(ttl), tracelist1[-1]])
-
+                    #print("Added to tracelist2")
+                    #print(tracelist2)
                     tracelist1.clear()
-                    #print("Request timed out.")
+                    #print("tracelist2 cleared")
+                    #print("Request timed out")
                     # print('test')
                     #Fill in end
+                    print("On to packet stuff...")
                 recvPacket, addr = mySocket.recvfrom(1024)
+
+                print("Now I will get time received")
                 timeReceived = time.time()
+                #print("Getting time received next")
+                #print(timeReceived)
                 timeLeft = timeLeft - howLongInSelect
+                #print(timeLeft)
                 if timeLeft <= 0:
-                    tracelist1.append("Request timed out.")
-                    #Fill in start
-                    #You should add the list above to your all traces list
+                    tracelist1.append("* * * Request timed out.")
+                    # Fill in start
+                    # You should add the list above to your all traces list
                     tracelist2.append([str(ttl), tracelist1[-1]])
 
                     tracelist1.clear()
-                    #print("Request timed out.")
-                    # print('test)')
-                    #Fill in end
+                    # print("Request timed out")
+                    #print("cleared tracelist")
+                    # Fill in end
             except timeout:
+                print("Timed out and ready to continue")
                 continue
+                print("continue")
 
             else:
                 #Fill in start
                 #Fetch the icmp type from the IP packet
-                icmpHeader = recvPacket[20:28]
-                types, code, checksum, ID, seq = struct.unpack("bbHHh", icmpHeader)
+
+                #icmp_header = recPacket[20:28]
+                #type, icmp_code, checksum, packet_id, sequence_no = struct.unpack("bbHHh", icmp_header)
+
+                icmp_Type, icmp_Code, icmp_Checksum, icmp_ID, icmp_Sequence, timeSent = struct.unpack("bbHHhd",
+                                                                                                      recvPacket[20:36])
+                types = struct.unpack("b", recvPacket[20:21])
+
+                print("Fetched icmpHeader")
+
                 #Fill in end
                 try: #try to fetch the hostname
                     #Fill in start
                     hostName = gethostbyaddr(addr[0])[0]
+                    print(hostName)
                     #Fill in end
                 except herror: #if the host does not provide a hostname
                     #Fill in start
-                    #print("Unable to provide hostname")
+                    print("Unable to provide hostname")
                     hostName = "Unable to provide hostname"
                     #Fill in end
                 if types == 11:
+                    #print("Type 11 time Exceeded")
                     bytes = struct.calcsize("d")
                     timeSent = struct.unpack("d", recvPacket[28:28 + bytes])[0]
                     #Fill in start
                     #You should add your responses to your lists here
 
-                    mytimeSent = struct.unpack("d", recvPacket[28:36])[0]
-                    tracelist1.append([str(ttl), str(round((timeReceived - mytimeSent) * 1000)) + "ms", addr[0]])
+                    #mytimeSent = struct.unpack("d", recvPacket[28:36])[0]
+                    tracelist1.append([str(ttl), str(round((timeReceived - mytimeSent) * 1000)) + "ms", str(addr[0]),
+                                       hostName])
                     tracelist2.append(tracelist1)
 
                     tracelist1.clear()
                     # print("  %d rtt=%.0f ms %s" % (ttl, (timeReceived - t) * 1000, addr[0]))
                     #Fill in end
                 elif types == 3:
+                    #print("Type 3 Destination unreachable")
                     bytes = struct.calcsize("d")
                     timeSent = struct.unpack("d", recvPacket[28:28 + bytes])[0]
                     #Fill in start
                     #You should add your responses to your lists here
 
-                    mytimeSent = struct.unpack("d", recvPacket[28:36])[0]
-                    tracelist1.append([str(ttl), str(round((timeReceived - mytimeSent) * 1000)) + "ms", addr[0]])
+                    #tracelist1.append([str(ttl), str(round((timeReceived - mytimeSent) * 1000)) + "ms", addr[0]])
+                    tracelist1.append([str(ttl), '*', 'Request timed out'])
+
                     tracelist2.append(tracelist1)
 
                     tracelist1.clear()
                     #print("  %d rtt=%.0f ms %s" % (ttl, (timeReceived - t) * 1000, addr[0]))
                     #Fill in end
                 elif types == 0:
+                    #print("Type 0 Echo reply")
                     bytes = struct.calcsize("d")
                     timeSent = struct.unpack("d", recvPacket[28:28 + bytes])[0]
                     #Fill in start
                     #You should add your responses to your lists here and return your list if your destination IP is met
 
                     #mytimeSent = struct.unpack("d", recvPacket[28:36])[0]
-                    tracelist1.append([str(ttl), str(round((timeReceived - timeSent) * 1000)) + "ms", addr[0]])
+                    tracelist1.append([str(ttl), str(round((timeReceived - timeSent) * 1000)) + "ms", str(addr[0]),
+                                       hostName])
                     #tracelist1.append([str(ttl), str(round((timeReceived - mytimeSent) * 1000)) + "ms", gethostbyaddr(destAddr[0])])
                     tracelist2.append(tracelist1)
 
@@ -171,11 +208,13 @@ def get_route(hostname):
                 else:
                     #Fill in start
                     #If there is an exception/error to your if statements, you should append that to your list here
-                    print("Error")
+                    #print("Error")
+                    tracelist1.append([ttl, "*", "Error received"])
                     #Fill in end
                 break
             finally:
                 mySocket.close()
         return tracelist2
+
 if __name__ == '__main__':
-    get_route("google.co.il")
+    get_route("google.com")
