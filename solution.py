@@ -197,7 +197,7 @@ def get_route(hostname):
 
                     tracelist2.append(tracelist1)
                     #tracelist1.clear() -- Having this uncommented removes everything
-                    print(tracelist2)
+                    #print(tracelist2)
                     return tracelist2
 
                     #tracelist1.clear()
