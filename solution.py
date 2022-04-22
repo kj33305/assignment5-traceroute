@@ -176,8 +176,9 @@ def get_route(hostname):
                     #  Fill in start
                     #  You should add your responses to your lists here
 
-                    #  tracelist1.append([str(ttl), str(round((timeReceived - timeSent) * 1000)) + "ms", addr[0]])
-                    tracelist1.append([str(ttl), '*', 'Request timed out'])
+                    tracelist1.append([str(ttl), str(round((timeReceived - timeSent) * 1000)) + "ms", str(addr[0]),
+                                       hostName])
+                    #tracelist1.append([str(ttl), '*', 'Request timed out'])
 
                     tracelist2.append(tracelist1)
 
@@ -190,7 +191,7 @@ def get_route(hostname):
                     # You should add your responses to your lists here and return your list if your destination IP is met
 
                     tracelist1.append([str(ttl), str(round((timeReceived - timeSent) * 1000)) + "ms", str(addr[0]),
-                                       (hostName)])
+                                       hostName])
 
                     tracelist2.append(tracelist1)
                     #tracelist1.clear() -- Having this uncommented removes everything
@@ -204,6 +205,7 @@ def get_route(hostname):
                     # If there is an exception/error to your if statements, you should append that to your list here
                     # print("Error")
                     tracelist1.append([str(ttl), "*", "Error received"])
+                    tracelist2.append(tracelist1)
                     # Fill in end
                 break
             finally:
