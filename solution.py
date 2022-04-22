@@ -190,11 +190,11 @@ def get_route(hostname):
                     # You should add your responses to your lists here and return your list if your destination IP is met
 
                     tracelist1.append([str(ttl), str(round((timeReceived - timeSent) * 1000)) + "ms", str(addr[0]),
-                                       hostName])
+                                       (hostName)])
 
                     tracelist2.append(tracelist1)
                     #tracelist1.clear() -- Having this uncommented removes everything
-
+                    print(tracelist2)
                     return tracelist2
 
                     #tracelist1.clear()
